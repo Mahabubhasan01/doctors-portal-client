@@ -3,7 +3,7 @@ import img from  '../../assets/images/chair.png'
 
 const Banner = () => {
   return (
-    <div className="">
+    <div className="p-10 my-10">
       <div classNameName="hero min-h-screen ">
         <div className="hero-content flex-col justify-between lg:flex-row-reverse">
           <img
