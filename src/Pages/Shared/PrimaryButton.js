@@ -3,7 +3,7 @@ import React from 'react';
 const PrimaryButton = ({children}) => {
     return (
         <div>
-            <button class="btn btn-primary w-32">{children}</button>
+            <button className="btn btn-primary w-32">{children}</button>
         </div>
     );
 };

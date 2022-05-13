@@ -1,4 +1,5 @@
 import React from 'react';
+import CustomForm from '../Login/CustomForm';
 import Footer from '../Shared/Footer/Footer';
 import Appointment from './Appointment/Appointment';
 import Banner from './Banner';
@@ -16,6 +17,7 @@ const Home = () => {
             <Treatment/>
             <Appointment/>
             <Testimonial/>
+            <CustomForm/>
             <Footer/>
         </>
     );
