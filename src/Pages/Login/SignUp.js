@@ -1,5 +1,6 @@
 import React from "react";
 import {
+    useAuthState,
     useCreateUserWithEmailAndPassword,
   useSignInWithGoogle,
   useUpdateProfile,
@@ -7,9 +8,11 @@ import {
 import auth from "../../firebase.init";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import useToken from "../../Hooks/useToken";
 
 const SignUp = () => {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const [mUser] = useAuthState(auth);
   const {
     register,
     formState: { errors },
@@ -24,22 +27,24 @@ const SignUp = () => {
   const [signInWithGoogle, cUser, cLoading, cError] = useSignInWithGoogle(auth);
 
   const [updateProfile, updating, Uerror] = useUpdateProfile(auth);
+  const [token] = useToken(user,cUser,mUser)
   let signInErrorMessage;
-  if (cLoading || loading || updating) {
-    /*  return <button className="btn loading flex h-screen w-screen justify-center items-center">Loading</button> */
-  }
+
+  /* if (cLoading || loading || updating) {
+     return <button className="btn loading flex h-screen w-screen justify-center items-center">Loading</button>
+  } */
   if (error || cError||Uerror) {
     signInErrorMessage = <p>{error?.message || cError?.message ||Uerror?.message}</p>;
   }
-  if (cUser || user) {
-    console.log(user);
+  if (token) {
+    navigate('/appointment');
   }
   const onSubmit = async(data, e) => {
     console.log(data);
    await createUserWithEmailAndPassword(data.email, data.password);
    await updateProfile({displayName:data.name})
     e.target.reset();
-    navigate('/')
+   /*  navigate('/') */
   };
 
   return (
@@ -139,7 +144,7 @@ const SignUp = () => {
 
             {signInErrorMessage}
 
-            {cLoading || loading ? (
+            {cLoading || loading || updating? (
               <button className="btn loading w-full max-w-xs text-white"></button>
             ) : (
               <input

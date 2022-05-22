@@ -1,13 +1,46 @@
 import React from "react";
 import { format } from "date-fns";
+import { useAuthState } from "react-firebase-hooks/auth";
+import auth from "../../firebase.init";
+import { toast } from "react-toastify";
 
-const BookingModel = ({ date, treatment, setTreatment }) => {
+const BookingModel = ({ date, treatment, setTreatment,refetch }) => {
+  const [user] = useAuthState(auth);
+  const { name, slots, _id } = treatment;
   const handleBooking = (event) => {
     event.preventDefault();
     const slot = event.target.slot.value;
-    setTreatment(null);
+    const formateDate = format(date, "PP");
+    const booking = {
+      treatmentId: _id,
+      treatment: name,
+      date: formateDate,
+      slot,
+      patient: user.email,
+      patientName: user.displayName,
+      phone: event.target.phone.value,
+    };
+    fetch("http://localhost:5000/booking", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(booking),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          toast(`Appointment is booked ${formateDate} at ${slot}`);
+        } else {
+          toast(` Already have an appointment at ${data.booking?.date} at ${data.booking?.slot}`);
+        }
+        refetch()
+        toast.success('Successfully booked')
+        setTreatment(null);
+      });
   };
-  const { name, slots } = treatment;
+
   return (
     <div>
       <input type="checkbox" id="my-modal-6" className="modal-toggle" />
@@ -34,20 +67,24 @@ const BookingModel = ({ date, treatment, setTreatment }) => {
               className="input input-bordered w-full max-w-xs mt-3"
             />
             <select className="select select-bordered w-full max-w-xs">
-              {slots.map((slot) => (
-                <option value={slot}>{slot}</option>
+              {slots.map((slot, i) => (
+                <option key={i} value={slot}>
+                  {slot}
+                </option>
               ))}
             </select>
             <input
               type="text"
               name="name"
-              placeholder="Your Name"
+              readOnly
+              value={user?.displayName || "Anonymous"}
               className="input input-bordered w-full max-w-xs"
             />
             <input
               type="email"
               name="email"
-              placeholder="Email Address"
+              disabled
+              value={user?.email || "Anonymous@mail.com"}
               className="input input-bordered w-full max-w-xs"
             />
             <input
